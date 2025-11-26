@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { CommentList } from "@/components/CommentList";
 import { PageHeader } from "@/components/PageHeader";
 import { fetchTicket, fetchTicketComments } from "@/lib/api";
 import { Comment, Ticket } from "@/lib/types";
 
 type Props = {
-  params: { ticketId: string };
+  params: Promise<{ ticketId: string }>;
 };
 
 export default function TicketDetailsPage({ params }: Props) {
+  const { ticketId } = use(params);
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,8 +21,8 @@ export default function TicketDetailsPage({ params }: Props) {
   useEffect(() => {
     let isMounted = true;
     Promise.all([
-      fetchTicket(params.ticketId),
-      fetchTicketComments(params.ticketId),
+      fetchTicket(ticketId),
+      fetchTicketComments(ticketId),
     ])
       .then(([ticketPayload, commentPayload]) => {
         if (!isMounted) return;
@@ -39,7 +40,7 @@ export default function TicketDetailsPage({ params }: Props) {
     return () => {
       isMounted = false;
     };
-  }, [params.ticketId]);
+  }, [ticketId]);
 
   if (loading) {
     return <div className="section-card">Loading ticket…</div>;

@@ -1,62 +1,181 @@
-# Support Portal API (Chalice)
+# Support Portal Backend
 
-## Quick start
+A standalone Python backend built with FastAPI that provides all the APIs needed by the Next.js frontend.
 
-```bash
-cd backend
-python -m venv .venv
-.venv\Scripts\activate  # or source .venv/bin/activate on macOS/Linux
-pip install -r requirements.txt
-cp env.example .env
-chalice local
+## 🚀 Quick Start
+
+### Windows (Recommended)
+```cmd
+# Run the setup and start script
+run.bat
 ```
 
-The service listens on `http://localhost:8000`. The default `DEFAULT_USER_ID` is `demo-user`.
+### Manual Setup
+```bash
+# 1. Create virtual environment
+python -m venv venv
 
-## Ticket workflow
+# 2. Activate it
+# Windows:
+venv\Scripts\activate.bat
+# Linux/Mac:
+source venv/bin/activate
 
-1. **Create ticket (`POST /tickets`)**
-   - Request body: `subject`, `priority`, `category`, `description`, plus optional Base64 `attachment`.
-   - Backend uploads the attachment to S3 (or `tmp/s3` when `AWS_OFFLINE=true`), stores the public URL in `ticket_files`, and inserts the ticket row into **PostgreSQL**.
-2. **List tickets (`GET /tickets/my`)**
-   - Uses the `X-User-Id` header to scope queries to the logged-in user.
-3. **Ticket details + comments**
-   - `GET /tickets/{id}` returns the record, `GET /tickets/{id}/comments` returns the threaded discussion.
-4. **Dashboard metrics (`GET /dashboard/metrics`)**
-   - Aggregates Total/Open/Resolved counts directly in SQL for the same user ID.
+# 3. Install dependencies
+pip install -r requirements.txt
 
-## Environment variables
+# 4. Create environment file
+copy .env.example .env
 
-| Variable | Purpose |
-| --- | --- |
-| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | **Required for PostgreSQL/RDS.** Populate these to target your RDS instance. When `DB_HOST` is empty the service falls back to a local SQLite file purely for development. |
-| `AWS_REGION` | AWS region used by the Chalice app and S3 uploads. |
-| `S3_BUCKET_NAME` | Destination bucket for ticket attachments. |
-| `AWS_OFFLINE` | When `"true"` files are saved under `tmp/s3` instead of calling S3. |
-| `DEFAULT_USER_ID` | Used when an auth layer is not in place. |
+# 5. Run the server
+python app.py
+```
 
-Copy `env.example` to `.env`, fill in the values, and Chalice will load them via `python-dotenv`.
+## 📋 API Endpoints
 
-## API surface
+The backend provides these endpoints that match your frontend's expectations:
 
-- `GET /health` – readiness probe
-- `POST /tickets` – create tickets (accepts JSON with optional Base64 attachment)
-- `GET /tickets/my` – fetch tickets scoped to the requesting user
-- `GET /tickets/{ticket_id}` – fetch a single ticket
-- `GET /tickets/{ticket_id}/comments` – fetch comments for a ticket
-- `GET /dashboard/metrics` – aggregate KPI cards for the dashboard
+### Core Endpoints
+- **GET** `/` - API information
+- **GET** `/health` - Health check
+- **GET** `/docs` - Interactive API documentation
 
-Send the `X-User-Id` header to impersonate a specific user. The front-end uses `demo-user` by default.
+### Ticket Management
+- **POST** `/tickets` - Create a new ticket with optional file attachment
+- **GET** `/tickets/my` - Get all tickets for the current user
+- **GET** `/tickets/{ticket_id}` - Get specific ticket details
+- **GET** `/tickets/{ticket_id}/comments` - Get comments for a ticket
+- **GET** `/dashboard/metrics` - Get dashboard metrics (total, open, resolved tickets)
 
-## AWS deployment
+## 🗄️ Database
 
-The repo already follows Chalice conventions so promoting to AWS later is straightforward:
+The backend uses **SQLite** by default (file: `support_portal.db`) with automatic fallback from PostgreSQL if configured.
 
-1. Configure AWS credentials locally (`aws configure` or environment variables).
-2. Provision PostgreSQL on Amazon RDS and an S3 bucket for attachments.
-3. Update `.chalice/config.json` with IAM role information or let Chalice manage it.
-4. Set the `.env` variables (or use Secrets Manager/Parameter Store) with the RDS + S3 settings.
-5. Run `chalice deploy --stage prod`.
+### Database Schema
+- **tickets** - Main ticket information
+- **ticket_files** - File attachments linked to tickets  
+- **comments** - Comments on tickets
 
-Reminder: in AWS you should disable `AWS_OFFLINE`, ensure the Lambda IAM role has `s3:PutObject` permissions for the bucket, and allow outbound networking to the RDS instance (security groups/subnets).
+## 📁 File Uploads
 
+Supports file attachments with:
+- **S3 Upload** - If AWS credentials are configured
+- **Local Storage** - Fallback to `uploads/` folder
+- **Base64 Support** - Frontend sends files as base64 data
+- **File Size Limit** - 10MB by default
+
+## 🔧 Configuration
+
+Edit `.env` file to customize settings:
+
+```env
+# Database (leave empty to use SQLite)
+DATABASE_URL=postgresql://user:pass@localhost/support_portal
+
+# AWS S3 (leave empty to use local storage)
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+S3_BUCKET_NAME=your-bucket-name
+
+# Server settings
+PORT=8000
+DEBUG=true
+DEFAULT_USER_ID=demo-user
+```
+
+## 🔐 Authentication
+
+- Uses `X-User-Id` header for user identification
+- Falls back to `DEFAULT_USER_ID` from environment
+- Compatible with your frontend's authentication
+
+## 🌐 CORS & Frontend Integration
+
+- CORS is fully enabled for frontend integration
+- Accepts requests from any origin during development
+- Frontend should work without changes by pointing to `http://localhost:8000`
+
+## 🧪 Testing
+
+### Using the Interactive Documentation
+1. Start the server: `run.bat`
+2. Open: http://localhost:8000/docs
+3. Try out endpoints directly in the browser
+
+### Using curl
+```bash
+# Health check
+curl http://localhost:8000/health
+
+# Create a ticket
+curl -X POST http://localhost:8000/tickets \
+  -H "Content-Type: application/json" \
+  -H "X-User-Id: demo-user" \
+  -d '{
+    "subject": "Test Issue",
+    "priority": "medium", 
+    "category": "general",
+    "description": "This is a test ticket"
+  }'
+
+# Get my tickets
+curl -H "X-User-Id: demo-user" http://localhost:8000/tickets/my
+
+# Get dashboard metrics
+curl -H "X-User-Id: demo-user" http://localhost:8000/dashboard/metrics
+```
+
+## 📊 Features
+
+✅ **FastAPI Framework** - Modern, fast, and well-documented
+✅ **SQLite Database** - No setup required, works out of the box
+✅ **File Upload Support** - S3 or local storage
+✅ **Interactive API Docs** - Built-in Swagger UI
+✅ **Error Handling** - Comprehensive error responses
+✅ **CORS Enabled** - Ready for frontend integration
+✅ **AWS Lambda Ready** - Designed for easy AWS deployment
+✅ **Environment Configuration** - Flexible setup via .env file
+
+## 🚀 AWS Lambda Deployment (Future)
+
+The code is structured to be AWS Lambda-ready:
+- `lambda_handler()` function included for Lambda deployment
+- Environment-based configuration
+- Stateless design
+- Compatible with AWS API Gateway
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Port already in use:**
+- Change `PORT=8000` in `.env` file
+
+**Import errors:**
+- Make sure virtual environment is activated
+- Run `pip install -r requirements.txt`
+
+**Database errors:**
+- Check file permissions in backend directory
+- SQLite file will be created automatically
+
+**File upload errors:**
+- Check `uploads/` folder exists and is writable
+- Verify file size is under 10MB limit
+
+### Logs
+The server logs all activity to the console. Watch for:
+- Request details and timing
+- Database operations
+- File upload status
+- Error details with stack traces
+
+## 🔄 Development Workflow
+
+1. **Start backend:** `run.bat` 
+2. **Start frontend:** `npm run dev` (in frontend directory)
+3. **Make changes:** Both will hot-reload automatically
+4. **Test:** Use interactive docs or frontend
+5. **Deploy:** Convert to Lambda when ready
+
+The backend is designed to work seamlessly with your existing Next.js frontend while providing a solid foundation for AWS deployment.

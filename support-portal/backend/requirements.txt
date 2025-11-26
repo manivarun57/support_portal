@@ -1,5 +1,16 @@
-chalice==1.30.0
+# Core FastAPI dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+pydantic==2.5.0
+
+# AWS and Database
 boto3==1.35.36
-python-dotenv==1.0.1
 psycopg2-binary==2.9.9
+
+# Utilities
+python-dotenv==1.0.1
+
+# Original Chalice (for reference/migration)
+chalice==1.30.0
 
