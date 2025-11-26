@@ -15,7 +15,7 @@ export function PageHeader({ title, subtitle, actions }: Props) {
         <h1>{title}</h1>
         {subtitle ? <p>{subtitle}</p> : null}
       </div>
-      {actions ? <div style={{ display: "flex", gap: "0.5rem" }}>{actions}</div> : null}
+      {actions ? <div className="page-header-actions">{actions}</div> : null}
     </div>
   );
 }

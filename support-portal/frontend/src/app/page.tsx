@@ -66,8 +66,19 @@ export default function Home() {
       </div>
 
       {error ? (
-        <div className="section-card" style={{ color: "#b91c1c" }}>
-          {error}
+        <div className="error-card">
+          <div className="error-icon">
+            <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+              <path d="m15 9-6 6" stroke="currentColor" strokeWidth="2"/>
+              <path d="m9 9 6 6" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+          </div>
+          <div>
+            <h3>Connection Error</h3>
+            <p>{error}</p>
+            <p className="error-hint">Please check your backend connection and try again.</p>
+          </div>
         </div>
       ) : (
         <div className="card-grid">
