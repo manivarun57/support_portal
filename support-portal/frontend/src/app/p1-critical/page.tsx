@@ -5,19 +5,12 @@ import { FormEvent, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { createTicket } from "@/lib/api";
 
-const priorities = [
-  { label: "Low", value: "low" },
-  { label: "Medium", value: "medium" },
-  { label: "High", value: "high" },
-  { label: "P1 Critical", value: "P1" },
-];
-
-export default function CreateTicketPage() {
+export default function P1CriticalPage() {
   const router = useRouter();
   const [formState, setFormState] = useState({
     subject: "",
-    priority: "medium",
-    category: "",
+    priority: "P1", // Fixed to P1 priority
+    category: "P1 Critical Incident",
     description: "",
   });
   const [fileData, setFileData] = useState<{
@@ -57,10 +50,10 @@ export default function CreateTicketPage() {
         ...fileData,
       };
       const response = await createTicket(payload);
-      setSuccess("Ticket created successfully!");
+      setSuccess("P1 Critical ticket created successfully!");
       setTimeout(() => router.push(`/tickets/${response.ticket.id}`), 800);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Unable to create ticket");
+      setError(err instanceof Error ? err.message : "Unable to create P1 ticket");
     } finally {
       setSubmitting(false);
     }
@@ -69,13 +62,28 @@ export default function CreateTicketPage() {
   return (
     <>
       <PageHeader
-        title="Create Ticket"
-        subtitle="Provide as much detail as possible to help the support team triage faster."
+        title="🚨 P1 Critical Incident"
+        subtitle="For critical incidents requiring immediate attention. This will create a high-priority ticket."
       />
+
+      <div className="section-card" style={{ backgroundColor: "#fef2f2", borderColor: "#dc2626" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
+          <span style={{ fontSize: "1.5rem" }}>⚠️</span>
+          <strong style={{ color: "#dc2626" }}>Critical Incident Guidelines</strong>
+        </div>
+        <ul style={{ color: "#7f1d1d", margin: 0, paddingLeft: "1.5rem" }}>
+          <li>Use only for production-impacting issues</li>
+          <li>Service outages or critical functionality failures</li>
+          <li>Security incidents requiring immediate response</li>
+          <li>Data integrity or customer-facing critical issues</li>
+        </ul>
+      </div>
 
       <form className="section-card" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="subject">Subject</label>
+          <label htmlFor="subject">
+            Incident Summary <span style={{ color: "#dc2626" }}>*</span>
+          </label>
           <input
             id="subject"
             name="subject"
@@ -83,8 +91,23 @@ export default function CreateTicketPage() {
             onChange={(e) =>
               setFormState((prev) => ({ ...prev, subject: e.target.value }))
             }
+            placeholder="Brief description of the critical issue"
             required
           />
+        </div>
+
+        <div>
+          <label htmlFor="priority">Priority</label>
+          <input
+            id="priority"
+            name="priority"
+            value="P1 - Critical"
+            disabled
+            style={{ backgroundColor: "#f9fafb", color: "#374151" }}
+          />
+          <small style={{ color: "#6b7280" }}>
+            Fixed to P1 Critical priority for immediate escalation
+          </small>
         </div>
 
         <div>
@@ -96,31 +119,14 @@ export default function CreateTicketPage() {
             onChange={(e) =>
               setFormState((prev) => ({ ...prev, category: e.target.value }))
             }
-            placeholder="Billing, Access, Incident, etc."
-            required
+            placeholder="P1 Critical Incident"
           />
         </div>
 
         <div>
-          <label htmlFor="priority">Priority</label>
-          <select
-            id="priority"
-            name="priority"
-            value={formState.priority}
-            onChange={(e) =>
-              setFormState((prev) => ({ ...prev, priority: e.target.value }))
-            }
-          >
-            {priorities.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="description">Description</label>
+          <label htmlFor="description">
+            Detailed Description <span style={{ color: "#dc2626" }}>*</span>
+          </label>
           <textarea
             id="description"
             name="description"
@@ -128,18 +134,29 @@ export default function CreateTicketPage() {
             onChange={(e) =>
               setFormState((prev) => ({ ...prev, description: e.target.value }))
             }
+            placeholder="Provide detailed information about:
+• What is the impact?
+• When did it start?
+• What steps have been taken?
+• Any error messages or logs?"
+            rows={6}
             required
           />
         </div>
 
         <div>
-          <label htmlFor="attachment">Attachment (optional)</label>
+          <label htmlFor="attachment">Supporting Files (logs, screenshots, etc.)</label>
           <input id="attachment" type="file" onChange={handleFileChange} />
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <button className="btn btn-primary" type="submit" disabled={submitting}>
-            {submitting ? "Submitting..." : "Submit Ticket"}
+          <button 
+            className="btn btn-primary" 
+            type="submit" 
+            disabled={submitting}
+            style={{ backgroundColor: "#dc2626", borderColor: "#dc2626" }}
+          >
+            {submitting ? "Creating P1 Ticket..." : "🚨 Submit P1 Critical Ticket"}
           </button>
           {error && <span style={{ color: "#b91c1c" }}>{error}</span>}
           {success && <span style={{ color: "#16a34a" }}>{success}</span>}
@@ -148,4 +165,3 @@ export default function CreateTicketPage() {
     </>
   );
 }
-

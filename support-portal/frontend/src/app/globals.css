@@ -631,6 +631,19 @@ textarea {
   border-color: #bae6fd;
 }
 
+.pill-P1 {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 2px solid #dc2626;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .main-pane {

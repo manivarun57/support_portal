@@ -54,45 +54,16 @@ try:
 except ImportError:
     pass  # dotenv is optional
 
-# Configuration
-class Config:
-    # Database
-    DATABASE_URL = os.getenv("DATABASE_URL", "")
-    SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "support_portal.db")
-    
-    # AWS S3
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
-    AWS_REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
-    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "")
-    
-    # File Upload
-    MAX_FILE_SIZE = int(os.getenv("MAX_FILE_SIZE", "10485760"))  # 10MB
-    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "uploads")
-    
-    # Auth
-    DEFAULT_USER_ID = os.getenv("DEFAULT_USER_ID", "demo-user")
-    
-    # Server
-    PORT = int(os.getenv("PORT", "8000"))
-    DEBUG = os.getenv("DEBUG", "true").lower() == "true"
+# Import shared components
+from shared import (
+    Config, DatabaseManager, StorageManager, TicketRepository,
+    create_error_response, ApiResponse, Ticket
+)
 
 # Ensure upload folder exists
 os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
 
-# Data Models
-@dataclass
-class Ticket:
-    id: str
-    subject: str
-    priority: str
-    category: str
-    description: str
-    status: str
-    user_id: str
-    created_at: str
-    attachment_url: Optional[str] = None
-
+# Data Models (additional ones not in shared)
 @dataclass
 class TicketFile:
     id: str
@@ -119,77 +90,8 @@ class CreateTicketRequest(BaseModel):
     attachment_name: Optional[str] = None
     attachment_type: Optional[str] = None
 
-class ApiResponse(BaseModel):
-    success: bool = True
-    message: str = "OK"
-    data: Optional[Dict[Any, Any]] = None
-
-# Database Manager
-class DatabaseManager:
-    def __init__(self):
-        self.db_path = Config.SQLITE_DB_PATH
-        self.init_database()
-    
-    def get_connection(self):
-        """Get database connection with fallback to SQLite"""
-        if Config.DATABASE_URL and Config.DATABASE_URL.startswith("postgresql"):
-            try:
-                import psycopg2
-                return psycopg2.connect(Config.DATABASE_URL)
-            except (ImportError, Exception) as e:
-                print(f"⚠️ PostgreSQL connection failed, falling back to SQLite: {e}")
-        
-        return sqlite3.connect(self.db_path)
-    
-    def init_database(self):
-        """Initialize database tables"""
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            
-            # Tickets table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS tickets (
-                    id TEXT PRIMARY KEY,
-                    subject TEXT NOT NULL,
-                    priority TEXT NOT NULL,
-                    category TEXT NOT NULL,
-                    description TEXT NOT NULL,
-                    status TEXT DEFAULT 'open',
-                    user_id TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    attachment_url TEXT
-                )
-            """)
-            
-            # Ticket files table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS ticket_files (
-                    id TEXT PRIMARY KEY,
-                    ticket_id TEXT NOT NULL,
-                    file_url TEXT NOT NULL,
-                    file_name TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    FOREIGN KEY (ticket_id) REFERENCES tickets (id)
-                )
-            """)
-            
-            # Comments table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS comments (
-                    id TEXT PRIMARY KEY,
-                    ticket_id TEXT NOT NULL,
-                    user_id TEXT NOT NULL,
-                    comment TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    FOREIGN KEY (ticket_id) REFERENCES tickets (id)
-                )
-            """)
-            
-            conn.commit()
-            print("✅ Database initialized successfully")
-
-# File Storage Manager
-class StorageManager:
+# Extended Repository Classes
+class ExtendedTicketRepository(TicketRepository):
     def __init__(self):
         self.s3_client = None
         if HAS_BOTO3 and Config.AWS_ACCESS_KEY_ID and Config.S3_BUCKET_NAME:
@@ -489,8 +391,8 @@ async def create_ticket(request: Request, ticket_data: CreateTicketRequest):
             raise create_error_response("Missing required fields")
         
         # Validate priority
-        if ticket_data.priority not in ["low", "medium", "high"]:
-            raise create_error_response("Invalid priority. Must be: low, medium, or high")
+        if ticket_data.priority not in ["low", "medium", "high", "P1"]:
+            raise create_error_response("Invalid priority. Must be: low, medium, high, or P1")
         
         attachment_url = None
         
@@ -597,6 +499,8 @@ async def get_dashboard_metrics(request: Request):
     except Exception as e:
         print(f"❌ Get metrics error: {e}")
         raise create_error_response(f"Failed to fetch metrics: {str(e)}", 500)
+
+# P1 Critical tickets are now handled through regular tickets with priority='P1'
 
 # Error handlers
 @app.exception_handler(Exception)
