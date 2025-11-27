@@ -81,23 +81,75 @@ export default function Home() {
           </div>
         </div>
       ) : (
-        <div className="card-grid">
-          <KpiCard
-            label="Total Tickets"
-            value={loading ? "…" : metrics?.total ?? 0}
-            subtitle="All time"
-          />
-          <KpiCard
-            label="Open Tickets"
-            value={loading ? "…" : metrics?.open ?? 0}
-            subtitle="Awaiting response"
-          />
-          <KpiCard
-            label="Resolved Tickets"
-            value={loading ? "…" : metrics?.resolved ?? 0}
-            subtitle="Closed successfully"
-          />
-        </div>
+        <>
+          <div className="card-grid">
+            <KpiCard
+              label="System Uptime"
+              value="98.7%"
+              subtitle="All systems operational"
+              icon="✓"
+              variant="success"
+            />
+            <KpiCard
+              label="Avg P1 Response"
+              value="1.8 min"
+              subtitle="Critical incident response"
+              icon="🕐"
+              variant="info"
+            />
+            <KpiCard
+              label="Ops Team Available"
+              value="24/7"
+              subtitle="Always ready to help"
+              icon="👥"
+              variant="purple"
+            />
+          </div>
+
+          {/* P1 Critical Incident Status */}
+          <div className="section-card" style={{ textAlign: 'center', padding: '3rem 2rem' }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+              <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.5rem', fontWeight: '600' }}>
+                No Active P1 Incidents
+              </h2>
+              <p style={{ color: '#64748b', margin: '0 0 2rem 0' }}>
+                All systems operational. If you're experiencing a critical issue, report it immediately.
+              </p>
+            </div>
+            <Link 
+              href="/p1-critical" 
+              className="btn btn-primary"
+              style={{ 
+                backgroundColor: '#dc2626', 
+                borderColor: '#dc2626',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              ⚠️ Report P1 Critical Incident
+            </Link>
+          </div>
+
+          <div className="card-grid">
+            <KpiCard
+              label="Total Tickets"
+              value={loading ? "…" : metrics?.total ?? 0}
+              subtitle="All time"
+            />
+            <KpiCard
+              label="Open Tickets"
+              value={loading ? "…" : metrics?.open ?? 0}
+              subtitle="Awaiting response"
+            />
+            <KpiCard
+              label="Resolved Tickets"
+              value={loading ? "…" : metrics?.resolved ?? 0}
+              subtitle="Closed successfully"
+            />
+          </div>
+        </>
       )}
     </>
   );

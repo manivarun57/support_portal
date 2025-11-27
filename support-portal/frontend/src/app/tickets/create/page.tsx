@@ -9,6 +9,7 @@ const priorities = [
   { label: "Low", value: "low" },
   { label: "Medium", value: "medium" },
   { label: "High", value: "high" },
+  { label: "P1 Critical", value: "P1" },
 ];
 
 export default function CreateTicketPage() {

@@ -50,6 +50,21 @@ const navItems: { label: string; href: string; icon: ReactNode }[] = [
       </svg>
     ),
   },
+  {
+    label: "P1 Critical",
+    href: "/p1-critical",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none">
+        <path
+          d="M12 9v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export function SidebarNav() {

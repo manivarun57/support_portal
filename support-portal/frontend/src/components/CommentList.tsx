@@ -1,33 +1,87 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
 import { Comment } from "@/lib/types";
+import { createComment } from "@/lib/api";
 
 type Props = {
   comments: Comment[];
+  ticketId: string;
+  onCommentAdded?: (comment: Comment) => void;
 };
 
-export function CommentList({ comments }: Props) {
-  if (comments.length === 0) {
-    return (
-      <div className="section-card">
-        <p style={{ margin: 0 }}>No comments yet.</p>
-      </div>
-    );
-  }
+export function CommentList({ comments, ticketId, onCommentAdded }: Props) {
+  const [newComment, setNewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await createComment(ticketId, { comment: newComment.trim() });
+      setNewComment("");
+      if (onCommentAdded) {
+        onCommentAdded(response.comment);
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to add comment");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className="section-card" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      {comments.map((comment) => (
-        <div key={comment.id} style={{ borderBottom: "1px solid #e2e8f0", paddingBottom: "0.75rem" }}>
-          <p style={{ margin: 0, fontWeight: 600 }}>{comment.user_id}</p>
-          <p style={{ margin: "0.25rem 0", color: "#475569" }}>{comment.comment}</p>
-          <small style={{ color: "#94a3b8" }}>
-            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-          </small>
-        </div>
-      ))}
-    </div>
+    <>
+      {/* Add Comment Form */}
+      <div className="section-card comment-form">
+        <h3 className="comment-form-title">Add a comment</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="comment-input-wrapper">
+            <textarea
+              className="comment-textarea"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write your comment here..."
+              rows={4}
+              disabled={submitting}
+            />
+          </div>
+          <div className="comment-form-actions">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={submitting || !newComment.trim()}
+            >
+              {submitting ? "Adding..." : "Add Comment"}
+            </button>
+            {error && <span className="comment-error">{error}</span>}
+          </div>
+        </form>
+      </div>
+
+      {/* Comments List */}
+      <div className="section-card comments-list">
+        {comments.length === 0 ? (
+          <p className="no-comments">No comments yet.</p>
+        ) : (
+          comments.map((comment) => (
+            <div key={comment.id} className="comment-item">
+              <p className="comment-author">{comment.user_id}</p>
+              <p className="comment-text">{comment.comment}</p>
+              <small className="comment-time">
+                {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+              </small>
+            </div>
+          ))
+        )}
+      </div>
+    </>
   );
 }
 
