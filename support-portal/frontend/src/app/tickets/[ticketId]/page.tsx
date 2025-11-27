@@ -93,7 +93,11 @@ export default function TicketDetailsPage({ params }: Props) {
       </div>
 
       <h2 style={{ marginBottom: "0.75rem" }}>Comments</h2>
-      <CommentList comments={comments} />
+      <CommentList 
+        comments={comments} 
+        ticketId={ticketId}
+        onCommentAdded={(newComment) => setComments(prev => [...prev, newComment])}
+      />
     </>
   );
 }

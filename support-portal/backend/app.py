@@ -90,6 +90,9 @@ class CreateTicketRequest(BaseModel):
     attachment_name: Optional[str] = None
     attachment_type: Optional[str] = None
 
+class CreateCommentRequest(BaseModel):
+    comment: str
+
 # Extended Repository Classes
 class ExtendedTicketRepository(TicketRepository):
     def __init__(self):
@@ -292,19 +295,31 @@ class CommentRepository:
                 })
             return comments
     
-    def create_demo_comment(self, ticket_id: str, user_id: str):
-        """Create a demo comment for development"""
+    def create_comment(self, ticket_id: str, user_id: str, comment_text: str):
+        """Create a new comment for a ticket"""
         comment_id = str(uuid.uuid4())
         created_at = datetime.now(timezone.utc).isoformat()
-        comment_text = "Thank you for submitting your ticket. We've received your request and will respond within 24 hours."
         
         with self.db.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO comments (id, ticket_id, user_id, comment, created_at)
-                VALUES (?, ?, 'support-team', ?, ?)
-            """, (comment_id, ticket_id, comment_text, created_at))
+                VALUES (?, ?, ?, ?, ?)
+            """, (comment_id, ticket_id, user_id, comment_text, created_at))
             conn.commit()
+            
+        return {
+            'id': comment_id,
+            'ticket_id': ticket_id,
+            'user_id': user_id,
+            'comment': comment_text,
+            'created_at': created_at
+        }
+    
+    def create_demo_comment(self, ticket_id: str, user_id: str):
+        """Create a demo comment for development"""
+        comment_text = "Thank you for submitting your ticket. We've received your request and will respond within 24 hours."
+        return self.create_comment(ticket_id, 'support-team', comment_text)
 
 class TicketFileRepository:
     def __init__(self, db_manager: DatabaseManager):
@@ -484,6 +499,27 @@ async def get_ticket_comments(ticket_id: str):
     except Exception as e:
         print(f"❌ Get comments error: {e}")
         raise create_error_response(f"Failed to fetch comments: {str(e)}", 500)
+
+@app.post("/tickets/{ticket_id}/comments")
+async def create_ticket_comment(request: Request, ticket_id: str, comment_data: CreateCommentRequest):
+    """Create a new comment for a ticket"""
+    try:
+        user_id = get_user_id(request)
+        
+        # Validate comment text
+        if not comment_data.comment.strip():
+            raise create_error_response("Comment cannot be empty")
+        
+        # Create comment
+        comment = comment_repo.create_comment(ticket_id, user_id, comment_data.comment.strip())
+        print(f"✅ Comment created for ticket {ticket_id} by {user_id}")
+        return {"comment": comment}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Create comment error: {e}")
+        raise create_error_response(f"Failed to create comment: {str(e)}", 500)
 
 @app.get("/dashboard/metrics")
 async def get_dashboard_metrics(request: Request):

@@ -74,3 +74,14 @@ export async function createTicket(payload: CreateTicketInput) {
   });
 }
 
+type CreateCommentInput = {
+  comment: string;
+};
+
+export async function createComment(ticketId: string, payload: CreateCommentInput) {
+  return apiFetch<{ comment: Comment }>(`/tickets/${ticketId}/comments`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
