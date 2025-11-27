@@ -2,166 +2,117 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { PageHeader } from "@/components/PageHeader";
 import { createTicket } from "@/lib/api";
 
 export default function P1CriticalPage() {
   const router = useRouter();
   const [formState, setFormState] = useState({
     subject: "",
-    priority: "P1", // Fixed to P1 priority
+    priority: "P1",
     category: "P1 Critical Incident",
     description: "",
   });
-  const [fileData, setFileData] = useState<{
-    attachment?: string;
-    attachment_name?: string;
-    attachment_type?: string;
-  }>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      setFileData({});
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFileData({
-        attachment: (reader.result as string).split(",")[1],
-        attachment_name: file.name,
-        attachment_type: file.type,
-      });
-    };
-    reader.readAsDataURL(file);
-  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setSubmitting(true);
     setError(null);
-    setSuccess(null);
+    
     try {
-      const payload = {
-        ...formState,
-        ...fileData,
-      };
-      const response = await createTicket(payload);
-      setSuccess("P1 Critical ticket created successfully!");
-      setTimeout(() => router.push(`/tickets/${response.ticket.id}`), 800);
+      const response = await createTicket(formState);
+      // Redirect to the created ticket
+      router.push(`/tickets/${response.ticket.id}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Unable to create P1 ticket");
+      setError(err instanceof Error ? err.message : "Unable to create P1 incident");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <>
-      <PageHeader
-        title="🚨 P1 Critical Incident"
-        subtitle="For critical incidents requiring immediate attention. This will create a high-priority ticket."
-      />
-
-      <div className="section-card" style={{ backgroundColor: "#fef2f2", borderColor: "#dc2626" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-          <span style={{ fontSize: "1.5rem" }}>⚠️</span>
-          <strong style={{ color: "#dc2626" }}>Critical Incident Guidelines</strong>
-        </div>
-        <ul style={{ color: "#7f1d1d", margin: 0, paddingLeft: "1.5rem" }}>
-          <li>Use only for production-impacting issues</li>
-          <li>Service outages or critical functionality failures</li>
-          <li>Security incidents requiring immediate response</li>
-          <li>Data integrity or customer-facing critical issues</li>
-        </ul>
+    <div className="p1-critical-container">
+      {/* Header */}
+      <div className="p1-header">
+        <div className="p1-alert-icon">⚠️</div>
+        <h1 className="p1-title">Report P1 Critical Incident</h1>
+        <p className="p1-subtitle">
+          This will immediately notify the operations team and create a dedicated Slack channel
+        </p>
       </div>
 
-      <form className="section-card" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="subject">
-            Incident Summary <span style={{ color: "#dc2626" }}>*</span>
+      {/* Form */}
+      <form className="p1-form" onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label htmlFor="incident-title" className="form-label">
+            Incident Title <span className="required">*</span>
           </label>
           <input
-            id="subject"
-            name="subject"
+            id="incident-title"
+            type="text"
+            className="form-input"
+            placeholder="e.g., Payment Gateway Down - All Transactions Failing"
             value={formState.subject}
-            onChange={(e) =>
-              setFormState((prev) => ({ ...prev, subject: e.target.value }))
-            }
-            placeholder="Brief description of the critical issue"
+            onChange={(e) => setFormState(prev => ({ ...prev, subject: e.target.value }))}
             required
           />
         </div>
 
-        <div>
-          <label htmlFor="priority">Priority</label>
-          <input
-            id="priority"
-            name="priority"
-            value="P1 - Critical"
-            disabled
-            style={{ backgroundColor: "#f9fafb", color: "#374151" }}
-          />
-          <small style={{ color: "#6b7280" }}>
-            Fixed to P1 Critical priority for immediate escalation
-          </small>
-        </div>
-
-        <div>
-          <label htmlFor="category">Category</label>
-          <input
-            id="category"
-            name="category"
-            value={formState.category}
-            onChange={(e) =>
-              setFormState((prev) => ({ ...prev, category: e.target.value }))
-            }
-            placeholder="P1 Critical Incident"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="description">
-            Detailed Description <span style={{ color: "#dc2626" }}>*</span>
+        <div className="form-field">
+          <label htmlFor="description" className="form-label">
+            Detailed Description <span className="required">*</span>
           </label>
           <textarea
             id="description"
-            name="description"
-            value={formState.description}
-            onChange={(e) =>
-              setFormState((prev) => ({ ...prev, description: e.target.value }))
-            }
-            placeholder="Provide detailed information about:
-• What is the impact?
-• When did it start?
-• What steps have been taken?
-• Any error messages or logs?"
+            className="form-textarea"
+            placeholder="Describe the issue in detail: What happened? When did it start? What is the business impact? Include any error messages or codes."
             rows={6}
+            value={formState.description}
+            onChange={(e) => setFormState(prev => ({ ...prev, description: e.target.value }))}
             required
           />
         </div>
 
-        <div>
-          <label htmlFor="attachment">Supporting Files (logs, screenshots, etc.)</label>
-          <input id="attachment" type="file" onChange={handleFileChange} />
+        {/* What happens next section */}
+        <div className="workflow-section">
+          <div className="workflow-header">
+            <span className="workflow-icon">⚠️</span>
+            <span className="workflow-title">What happens next?</span>
+          </div>
+          <ol className="workflow-list">
+            <li>Operations team receives immediate notification</li>
+            <li>Dedicated Slack channel created for real-time communication</li>
+            <li>Senior engineer assigned within 2 minutes</li>
+            <li>Regular status updates every 15 minutes</li>
+          </ol>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <button 
-            className="btn btn-primary" 
-            type="submit" 
+        {/* Action buttons */}
+        <div className="form-actions">
+          <button
+            type="submit"
+            className="btn-create-incident"
             disabled={submitting}
-            style={{ backgroundColor: "#dc2626", borderColor: "#dc2626" }}
           >
-            {submitting ? "Creating P1 Ticket..." : "🚨 Submit P1 Critical Ticket"}
+            <span className="btn-icon">⚠️</span>
+            {submitting ? "Creating P1 Incident..." : "Create P1 Incident"}
           </button>
-          {error && <span style={{ color: "#b91c1c" }}>{error}</span>}
-          {success && <span style={{ color: "#16a34a" }}>{success}</span>}
+          <button
+            type="button"
+            className="btn-cancel"
+            onClick={() => router.back()}
+          >
+            Cancel
+          </button>
         </div>
+
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
       </form>
-    </>
+    </div>
   );
 }
