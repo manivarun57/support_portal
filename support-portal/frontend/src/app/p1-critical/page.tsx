@@ -9,11 +9,25 @@ export default function P1CriticalPage() {
   const [formState, setFormState] = useState({
     subject: "",
     priority: "P1",
-    category: "P1 Critical Incident",
+    category: "Infrastructure",
     description: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // P1 Critical Issue Categories
+  const p1Categories = [
+    { value: "Infrastructure", label: "🖥️ Infrastructure - Server/Network Down" },
+    { value: "Database", label: "🗄️ Database - Data Loss/Corruption" },
+    { value: "Payment", label: "💳 Payment - Transaction Failures" },
+    { value: "Security", label: "🔒 Security - Breach/Vulnerability" },
+    { value: "API", label: "🔌 API - Service Outage" },
+    { value: "Performance", label: "⚡ Performance - System Unresponsive" },
+    { value: "DataLoss", label: "📊 Data Loss - Critical Data Missing" },
+    { value: "Authentication", label: "🔑 Authentication - Login Failures" },
+    { value: "Integration", label: "🔗 Integration - Third-party Failure" },
+    { value: "Other", label: "❓ Other Critical Issue" },
+  ];
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -64,6 +78,28 @@ export default function P1CriticalPage() {
             onChange={(e) => setFormState(prev => ({ ...prev, subject: e.target.value }))}
             required
           />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="category" className="form-label">
+            Issue Category <span className="required">*</span>
+          </label>
+          <select
+            id="category"
+            className="form-input"
+            value={formState.category}
+            onChange={(e) => setFormState(prev => ({ ...prev, category: e.target.value }))}
+            required
+          >
+            {p1Categories.map((cat) => (
+              <option key={cat.value} value={cat.value}>
+                {cat.label}
+              </option>
+            ))}
+          </select>
+          <p className="form-help-text">
+            Select the category that best describes this critical issue
+          </p>
         </div>
 
         <div className="form-field">

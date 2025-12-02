@@ -32,17 +32,17 @@ class P1LambdaHandler:
     def __init__(self):
         # DynamoDB setup
         self.dynamodb = boto3.resource('dynamodb',
-            region_name=os.environ.get('AWS_REGION', 'ap-south-1')
+            region_name=os.environ.get('DYNAMO_REGION', 'ap-south-1')
         )
-        self.table_name = os.environ.get('DYNAMODB_P1_TABLE', 'P1Incidents')
+        self.table_name = os.environ.get('DYNAMODB_TABLE_NAME', 'P1Incidents')
         self.table = self.dynamodb.Table(self.table_name)
         
         # Slack configuration
-        self.slack_bot_token = os.environ.get('SLACK_BOT_TOKEN', '')
+        self.slack_bot_token = os.environ.get('SLACK_BOT_TOKEN')
         self.slack_api_base = "https://slack.com/api"
         
         # Email configuration (console mode for now)
-        self.email_console_mode = os.environ.get('EMAIL_CONSOLE_MODE', 'true').lower() == 'true'
+        self.email_console_mode = True
         
         print(f"✅ P1 Lambda Handler initialized - Table: {self.table_name}")
     
@@ -682,7 +682,7 @@ if __name__ == "__main__":
             "subject": "Critical Database Connection Failure",
             "description": "Production database is not responding. Multiple users unable to access the system. Immediate attention required.",
             "category": "Infrastructure",
-            "slack_channel_id": os.getenv('SLACK_CHANNEL_ID', 'C0A10UFAT9N')
+            "slack_channel_id": 'C0A10UFAT9N'
         }
     }
     

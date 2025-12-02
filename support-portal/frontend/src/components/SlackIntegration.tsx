@@ -247,37 +247,13 @@ export default function SlackIntegration({ incidentId, ticketId, onChannelReady,
     if (!newMessage.trim()) return;
     
     const messageText = newMessage.trim();
-    const now = Date.now();
-    const messageId = `msg-${now}-${Math.random().toString(36).substr(2, 9)}`;
     
     console.log('=== SENDING MESSAGE ===');
     console.log('Text:', messageText);
     console.log('Current messages count:', messages.length);
     
-    const message = {
-      id: messageId,
-      user: "You",
-      avatar: "👤",
-      message: messageText,
-      timestamp: new Date().toISOString(),
-      type: "outbound"
-    };
-    
     // Clear input immediately for better UX
     setNewMessage("");
-    
-    // Add user's message to UI immediately
-    setMessages(prevMessages => {
-      const updatedMessages = [...prevMessages, message];
-      console.log('New messages count:', updatedMessages.length);
-      console.log('Last message:', updatedMessages[updatedMessages.length - 1]);
-      return updatedMessages;
-    });
-    
-    // Force a re-render by logging
-    setTimeout(() => {
-      console.log('Messages after update:', messages.length);
-    }, 100);
     
     try {
       // Send to real Slack via backend API
@@ -297,6 +273,45 @@ export default function SlackIntegration({ incidentId, ticketId, onChannelReady,
       }
       
       console.log('✅ Message sent to real Slack channel');
+      
+      // Immediately poll for new messages to show the user's message quickly
+      setTimeout(async () => {
+        try {
+          const pollResponse = await fetch(`http://localhost:8000/api/incidents/${incidentId}/messages`, {
+            headers: {
+              'X-User-Id': localStorage.getItem('selectedUserId') || 'demo-user'
+            }
+          });
+          
+          if (pollResponse.ok) {
+            const data = await pollResponse.json();
+            if (data.messages && data.messages.length > 0) {
+              // Use incremental update like the polling logic to avoid duplicates
+              setMessages(prevMessages => {
+                const existingIds = new Set(prevMessages.map(m => m.id));
+                
+                const newMessages = data.messages
+                  .filter((msg: any) => !existingIds.has(msg.id || msg.message_id))
+                  .map((msg: any) => ({
+                    id: msg.id || msg.message_id,
+                    user: msg.user || msg.user_name || 'Operations Team',
+                    avatar: msg.type === 'operations' ? '👨‍💻' : '👤',
+                    message: msg.message || msg.message_text,
+                    timestamp: msg.timestamp || msg.created_at,
+                    type: msg.type || 'user'
+                  }));
+                
+                if (newMessages.length > 0) {
+                  return [...prevMessages, ...newMessages];
+                }
+                return prevMessages;
+              });
+            }
+          }
+        } catch (pollError) {
+          console.error('Failed to poll messages after send:', pollError);
+        }
+      }, 500);
       
       // Check if user typed "resolved" to auto-resolve the incident
       if (messageText.toLowerCase() === 'resolved') {
