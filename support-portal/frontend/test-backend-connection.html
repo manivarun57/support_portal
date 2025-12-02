@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Connection Test</title>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    <button onclick="testConnection()">Test Connection</button>
+    <pre id="output"></pre>
+
+    <script>
+        async function testConnection() {
+            const output = document.getElementById('output');
+            output.textContent = 'Testing...\n';
+
+            try {
+                // Test 1: Simple GET request
+                output.textContent += '\n1. Testing GET /api/incidents/P1-20251201-80C8B872/messages\n';
+                const response = await fetch('http://localhost:8000/api/incidents/P1-20251201-80C8B872/messages', {
+                    headers: {
+                        'X-User-Id': 'demo-user'
+                    }
+                });
+                
+                output.textContent += `   Status: ${response.status}\n`;
+                output.textContent += `   OK: ${response.ok}\n`;
+                
+                const data = await response.json();
+                output.textContent += `   Data: ${JSON.stringify(data, null, 2)}\n`;
+                
+                output.textContent += '\n✅ SUCCESS - Backend is reachable!\n';
+            } catch (error) {
+                output.textContent += `\n❌ ERROR: ${error.message}\n`;
+                output.textContent += `   This usually means:\n`;
+                output.textContent += `   - Backend is not running\n`;
+                output.textContent += `   - CORS is blocking the request\n`;
+                output.textContent += `   - Network connectivity issue\n`;
+            }
+        }
+    </script>
+</body>
+</html>

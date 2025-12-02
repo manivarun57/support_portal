@@ -137,12 +137,12 @@ export default function CreateTicketPage() {
           <input id="attachment" type="file" onChange={handleFileChange} />
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+        <div className="form-actions-row">
           <button className="btn btn-primary" type="submit" disabled={submitting}>
             {submitting ? "Submitting..." : "Submit Ticket"}
           </button>
-          {error && <span style={{ color: "#b91c1c" }}>{error}</span>}
-          {success && <span style={{ color: "#16a34a" }}>{success}</span>}
+          {error && <span className="form-error-message">{error}</span>}
+          {success && <span className="form-success-message">{success}</span>}
         </div>
       </form>
     </>

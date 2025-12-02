@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SidebarNav } from "@/components/SidebarNav";
+import UserSelector from "@/components/UserSelector";
+import UserProfile from "@/components/UserProfile";
+import UserSwitcher from "@/components/UserSwitcher";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,11 +35,16 @@ export default function RootLayout({
               <span className="brand-icon">SP</span>
               <div>
                 <h1>Support Portal</h1>
-                <p style={{ margin: 0, color: "#94a3b8" }}>
+                <p className="brand-subtitle">
                   Pi Client Hub
                 </p>
               </div>
             </div>
+            <div className="mt-4">
+              <UserProfile />
+            </div>
+            <UserSwitcher />
+            <UserSelector />
             <SidebarNav />
           </aside>
           <div className="main-pane">

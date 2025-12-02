@@ -77,7 +77,15 @@ export default function MyTicketsPage() {
       {!loading && !error && (
         <TicketTable
           tickets={tickets}
-          onRowClick={(ticketId) => router.push(`/tickets/${ticketId}`)}
+          onRowClick={(ticketId) => {
+            const ticket = tickets.find(t => t.id === ticketId);
+            // If P1 ticket with active incident, redirect to Slack page
+            if (ticket?.p1_incident && ticket.p1_incident.status !== 'resolved') {
+              router.push(`/p1-critical/success/${ticket.p1_incident.incident_id}`);
+            } else {
+              router.push(`/tickets/${ticketId}`);
+            }
+          }}
         />
       )}
     </>

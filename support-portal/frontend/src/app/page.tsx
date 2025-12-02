@@ -61,7 +61,7 @@ export default function Home() {
           <p className="card-value">
             {loading ? "…" : metrics?.open ?? "—"}
           </p>
-          <p style={{ color: "#94a3b8" }}>Awaiting response</p>
+          <p className="ticket-status">Awaiting response</p>
         </div>
       </div>
 
@@ -107,26 +107,19 @@ export default function Home() {
           </div>
 
           {/* P1 Critical Incident Status */}
-          <div className="section-card" style={{ textAlign: 'center', padding: '3rem 2rem' }}>
-            <div style={{ marginBottom: '2rem' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
-              <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.5rem', fontWeight: '600' }}>
+          <div className="section-card p1-status-card">
+            <div className="p1-content">
+              <div className="p1-status-icon">⚠️</div>
+              <h2 className="p1-status-title">
                 No Active P1 Incidents
               </h2>
-              <p style={{ color: '#64748b', margin: '0 0 2rem 0' }}>
+              <p className="p1-status-description">
                 All systems operational. If you're experiencing a critical issue, report it immediately.
               </p>
             </div>
             <Link 
               href="/p1-critical" 
-              className="btn btn-primary"
-              style={{ 
-                backgroundColor: '#dc2626', 
-                borderColor: '#dc2626',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
+              className="btn btn-primary p1-critical-btn"
             >
               ⚠️ Report P1 Critical Incident
             </Link>

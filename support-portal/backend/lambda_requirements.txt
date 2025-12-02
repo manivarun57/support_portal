@@ -1,0 +1,5 @@
+# AWS Lambda Requirements for P1 Incident Handler
+# These packages will be bundled with the Lambda deployment
+
+requests>=2.31.0
+python-dotenv>=1.0.0

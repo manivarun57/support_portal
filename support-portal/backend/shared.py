@@ -111,9 +111,16 @@ class DatabaseManager:
                     status TEXT DEFAULT 'open',
                     user_id TEXT NOT NULL,
                     created_at TEXT NOT NULL,
+                    updated_at TEXT,
                     attachment_url TEXT
                 )
             """)
+            
+            # Add updated_at column if it doesn't exist (for existing databases)
+            try:
+                cursor.execute("ALTER TABLE tickets ADD COLUMN updated_at TEXT")
+            except:
+                pass  # Column already exists
             
             # Ticket files table
             cursor.execute("""
@@ -139,7 +146,23 @@ class DatabaseManager:
                 )
             """)
             
-
+            # P1 incidents tracking table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS p1_incidents (
+                    id TEXT PRIMARY KEY,
+                    ticket_id TEXT NOT NULL,
+                    incident_id TEXT UNIQUE NOT NULL,
+                    slack_channel_id TEXT,
+                    slack_message_id TEXT,
+                    slack_notification_sent BOOLEAN DEFAULT FALSE,
+                    slack_notification_sent_at TEXT,
+                    slack_webhook_url TEXT,
+                    status TEXT DEFAULT 'active',
+                    created_at TEXT NOT NULL,
+                    resolved_at TEXT,
+                    FOREIGN KEY (ticket_id) REFERENCES tickets (id)
+                )
+            """)
             
             conn.commit()
             print("✅ Database initialized successfully")

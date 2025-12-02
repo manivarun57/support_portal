@@ -22,8 +22,15 @@ export default function P1CriticalPage() {
     
     try {
       const response = await createTicket(formState);
-      // Redirect to the created ticket
-      router.push(`/tickets/${response.ticket.id}`);
+      
+      // Check if this is a P1 incident with incident details
+      if (response.p1_incident && response.p1_incident.incident_id) {
+        // Redirect to P1 success page with Slack integration
+        router.push(`/p1-critical/success/${response.p1_incident.incident_id}`);
+      } else {
+        // Fallback to regular ticket view
+        router.push(`/tickets/${response.ticket.id}`);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unable to create P1 incident");
     } finally {

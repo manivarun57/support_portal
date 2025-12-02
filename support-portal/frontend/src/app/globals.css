@@ -45,6 +45,8 @@ a {
   top: 0;
   height: 100vh;
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .brand {
@@ -984,4 +986,960 @@ textarea {
 .comment-time {
   color: #9ca3af;
   font-size: 0.75rem;
+}
+
+/* ===============================================
+   P1 INCIDENT SUCCESS PAGE & SLACK INTEGRATION
+   =============================================== */
+
+/* P1 Success Container */
+.p1-success-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.success-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.success-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #059669;
+}
+
+.success-subtitle {
+  margin: 0;
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+/* Incident Summary */
+.incident-summary {
+  background: #fff;
+  border: 2px solid #ef4444;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.1);
+}
+
+.incident-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ef4444;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.badge-label {
+  font-weight: 700;
+}
+
+.incident-id {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.incident-subject {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.incident-meta {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.meta-item .icon {
+  font-size: 1rem;
+}
+
+/* Response Timeline */
+.response-timeline {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.response-timeline h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.timeline-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.timeline-item.completed {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.timeline-item.active {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  animation: pulse 2s infinite;
+}
+
+.timeline-item.pending {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.timeline-item.completed .timeline-dot {
+  background: #059669;
+}
+
+.timeline-item.active .timeline-dot {
+  background: #f59e0b;
+}
+
+.timeline-item.pending .timeline-dot {
+  background: #9ca3af;
+}
+
+.timeline-content {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeline-title {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.timeline-time {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Slack Integration */
+.slack-integration {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.slack-integration.loading {
+  padding: 2rem;
+  text-align: center;
+}
+
+.slack-integration.error {
+  padding: 2rem;
+  text-align: center;
+}
+
+.slack-header {
+  background: #4a154b;
+  color: white;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slack-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.slack-icon {
+  font-size: 1.5rem;
+}
+
+.channel-details h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.channel-name {
+  margin: 0;
+  font-size: 0.875rem;
+  opacity: 0.8;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+.slack-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-indicator.online {
+  background: #28a745;
+  animation: pulse 2s infinite;
+}
+
+.slack-messages {
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+}
+
+.messages-header {
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.message-count {
+  background: #6366f1;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.messages-container {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.message.system {
+  background: #f0f9ff;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.message-content {
+  flex: 1;
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.message-user {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #1f2937;
+}
+
+.message-time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.message-text {
+  color: #4b5563;
+  line-height: 1.5;
+  font-size: 0.875rem;
+}
+
+.slack-input {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.message-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: white;
+}
+
+.message-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.send-btn {
+  padding: 0.75rem 1.5rem;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.send-btn:hover {
+  background: #5856eb;
+}
+
+.slack-footer {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.escalation-info {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.escalation-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.escalation-item .icon {
+  font-size: 1rem;
+}
+
+.open-slack-btn {
+  padding: 0.75rem 1.5rem;
+  background: #4a154b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.open-slack-btn:hover {
+  background: #611f69;
+}
+
+/* Incident Resolution Section */
+.incident-resolution {
+  padding: 1rem 1.5rem;
+  background: #f0fdf4;
+  border-top: 1px solid #bbf7d0;
+}
+
+.resolution-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.resolution-header .icon {
+  font-size: 1.125rem;
+}
+
+.resolution-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resolve-btn {
+  padding: 0.75rem 1.5rem;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  align-self: flex-start;
+}
+
+.resolve-btn:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.resolve-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.resolution-note {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #166534;
+  font-style: italic;
+}
+
+/* Loading States */
+.p1-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f6fb;
+}
+
+.loading-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.loading-spinner {
+  margin-bottom: 2rem;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #ef4444;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-content h2 {
+  margin: 0 0 0.5rem 0;
+  color: #1f2937;
+  font-size: 1.5rem;
+}
+
+.loading-content p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+/* Success Actions */
+.success-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.success-actions button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-view-ticket {
+  background: #6366f1;
+  color: white;
+}
+
+.btn-view-ticket:hover {
+  background: #5856eb;
+  transform: translateY(-1px);
+}
+
+.btn-my-tickets {
+  background: #10b981;
+  color: white;
+}
+
+.btn-my-tickets:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-home {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-home:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* Emergency Contact */
+.emergency-contact {
+  background: #fef2f2;
+  border: 2px solid #fecaca;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.emergency-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #dc2626;
+}
+
+.emergency-icon {
+  font-size: 1.25rem;
+}
+
+.emergency-text {
+  margin: 0 0 1.5rem 0;
+  color: #7f1d1d;
+}
+
+.emergency-contacts {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.emergency-btn {
+  padding: 0.75rem 1.5rem;
+  background: #dc2626;
+  color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.emergency-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===============================================
+   USER SELECTOR COMPONENT
+   =============================================== */
+
+.brand-subtitle {
+  margin: 0;
+  color: #94a3b8;
+}
+
+.user-selector {
+  position: relative;
+  margin: 1rem 0;
+  padding: 0 1.5rem;
+}
+
+.user-selector-trigger {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.user-selector-trigger:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.user-details {
+  text-align: left;
+}
+
+.user-name {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+.user-department {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+.dropdown-arrow {
+  color: #6b7280;
+  transition: transform 0.2s;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.user-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 999;
+}
+
+.user-selector-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-top: 0.25rem;
+  max-height: 400px;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-header {
+  padding: 1rem 1rem 0.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dropdown-header h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.dropdown-header p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.user-list {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.user-option {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+}
+
+.user-option:hover {
+  background: #f8fafc;
+}
+
+.user-option.selected {
+  background: #f0f9ff;
+  color: #0369a1;
+}
+
+.user-option .user-info {
+  flex: 1;
+}
+
+.user-email {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+.selected-indicator {
+  color: #0369a1;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.dropdown-footer {
+  padding: 0.5rem 1rem 1rem;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.user-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .p1-success-container {
+    padding: 1rem;
+  }
+  
+  .success-title {
+    font-size: 2rem;
+  }
+  
+  .incident-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .slack-footer {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .escalation-info {
+    justify-content: center;
+  }
+  
+  .success-actions {
+    flex-direction: column;
+  }
+  
+  .emergency-contacts {
+    flex-direction: column;
+  }
+
+  .user-selector {
+    margin: 0.5rem 0;
+    padding: 0 1rem;
+  }
+}
+
+/* ===============================================
+   INLINE STYLE REPLACEMENTS
+   =============================================== */
+
+/* Dashboard Page Styles */
+.ticket-status {
+  color: #94a3b8;
+}
+
+.p1-status-card {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.p1-content {
+  margin-bottom: 2rem;
+}
+
+.p1-status-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.p1-status-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.p1-status-description {
+  color: #64748b;
+  margin: 0 0 2rem 0;
+}
+
+.p1-critical-btn {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.p1-critical-btn:hover {
+  background-color: #b91c1c !important;
+  border-color: #b91c1c !important;
+}
+
+/* Form Styles */
+.form-actions-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.form-error-message {
+  color: #b91c1c;
+}
+
+.form-success-message {
+  color: #16a34a;
+}
+
+/* Ticket Detail Page Styles */
+.error-card-text {
+  color: #b91c1c;
+}
+
+.attachment-card {
+  margin-bottom: 1.5rem;
+}
+
+.ticket-description {
+  margin-top: 1rem;
+  color: #475569;
+}
+
+.attachment-link {
+  margin-top: 1rem;
+}
+
+.comments-header {
+  margin-bottom: 0.75rem;
+}
+
+.attachment-details {
+  margin-top: 1rem;
+  color: #475569;
+}
+
+.no-attachment {
+  margin-top: 1rem;
 }
